@@ -1,0 +1,44 @@
+interface EnvConfig {
+    NODE_ENV: string;
+    PORT: number;
+    API_VERSION: string;
+    DATABASE_URL: string;
+    REDIS_URL: string;
+    REDIS_PASSWORD?: string;
+    JWT_SECRET: string;
+    JWT_REFRESH_SECRET: string;
+    JWT_EXPIRES_IN: string;
+    JWT_REFRESH_EXPIRES_IN: string;
+    CORS_ORIGIN: string;
+    CORS_CREDENTIALS: boolean;
+    RATE_LIMIT_WINDOW_MS: number;
+    RATE_LIMIT_MAX_REQUESTS: number;
+    UPLOAD_DIR: string;
+    MAX_FILE_SIZE: number;
+    ALLOWED_FILE_TYPES: string[];
+    SMTP_HOST: string;
+    SMTP_PORT: number;
+    SMTP_USER: string;
+    SMTP_PASS: string;
+    FROM_EMAIL: string;
+    FROM_NAME: string;
+    LOG_LEVEL: string;
+    LOG_FILE: string;
+    LOG_MAX_SIZE: string;
+    LOG_MAX_FILES: string;
+    BCRYPT_ROUNDS: number;
+    SESSION_SECRET: string;
+    API_DOCS_ENABLED: boolean;
+    API_DOCS_PATH: string;
+    HEALTH_CHECK_ENABLED: boolean;
+    METRICS_ENABLED: boolean;
+    DEBUG: boolean;
+}
+export declare const config: EnvConfig;
+export declare const isDevelopment: () => boolean;
+export declare const isProduction: () => boolean;
+export declare const isTest: () => boolean;
+export declare const getFrontendUrl: () => string;
+export declare const getBackendUrl: () => string;
+export default config;
+//# sourceMappingURL=env.d.ts.map
