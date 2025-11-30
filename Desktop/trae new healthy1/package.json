@@ -1,0 +1,33 @@
+{
+  "name": "trae-nutrition-platform",
+  "version": "1.0.0",
+  "description": "Comprehensive nutrition and health tracking platform",
+  "main": "index.js",
+  "scripts": {
+    "dev": "cd frontend && npm run dev",
+    "build": "cd frontend && npm run build",
+    "start": "cd frontend && npm start",
+    "lint": "cd frontend && npm run lint",
+    "test": "cd frontend && npm test",
+    "test:ci": "cd frontend && npm test -- --coverage --watchAll=false",
+    "audit": "cd frontend && npm audit --audit-level moderate"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/doctororganic/new.git"
+  },
+  "keywords": [
+    "nutrition",
+    "health",
+    "fitness",
+    "nextjs",
+    "react",
+    "typescript"
+  ],
+  "author": "doctororganic",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  }
+}
