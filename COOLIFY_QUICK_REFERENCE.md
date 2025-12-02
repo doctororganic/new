@@ -11,7 +11,7 @@ Branch: main
 
 ### Docker Settings (CRITICAL - Most Common Error Fix)
 ```
-Dockerfile Path: backend/Dockerfile
+Dockerfile Path: Dockerfile          ← Relative to Build Context!
 Build Context: backend/
 Port: 8080
 ```
@@ -40,7 +40,7 @@ Print this and check off as you fill:
 - [ ] **Application Name**: `trae-backend`
 - [ ] **Repository**: Your GitHub/GitLab URL
 - [ ] **Branch**: `main` (or your default branch)
-- [ ] **Dockerfile Path**: `backend/Dockerfile` ⚠️
+- [ ] **Dockerfile Path**: `Dockerfile` ⚠️ (relative to Build Context!)
 - [ ] **Build Context**: `backend/` ⚠️
 - [ ] **Port**: `8080`
 - [ ] **Health Check Path**: `/health`
@@ -57,8 +57,10 @@ Print this and check off as you fill:
 
 These 2 fields fix the "no such file or directory" error:
 
-1. **Dockerfile Path**: `backend/Dockerfile`
+1. **Dockerfile Path**: `Dockerfile` (relative to Build Context!)
 2. **Build Context**: `backend/`
+
+**Important**: Dockerfile Path is relative to Build Context, not repository root!
 
 ---
 
@@ -78,7 +80,7 @@ When you see these fields in Coolify, fill them like this:
 │ [main________________________]      │
 ├─────────────────────────────────────┤
 │ Dockerfile Path                     │
-│ [backend/Dockerfile________]  ⚠️   │
+│ [Dockerfile_________________]  ⚠️   │ ← Just "Dockerfile"!
 ├─────────────────────────────────────┤
 │ Build Context                       │
 │ [backend/____________________]  ⚠️  │
@@ -138,8 +140,10 @@ ERROR: failed to build: resolve : lstat /artifacts/.../nutrition-platform: no su
 ```
 
 **Double-check these 2 fields:**
-- ✅ Dockerfile Path = `backend/Dockerfile` (not `Dockerfile`)
+- ✅ Dockerfile Path = `Dockerfile` (relative to Build Context, not `backend/Dockerfile`)
 - ✅ Build Context = `backend/` (not `.` or empty)
+
+**If you see `backend/backend/Dockerfile` in logs**: Change Dockerfile Path to `Dockerfile`
 
 ---
 

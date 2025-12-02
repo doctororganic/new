@@ -58,15 +58,15 @@ main
 
 ### **Dockerfile Path**
 ```
-backend/Dockerfile
+Dockerfile
 ```
-**⚠️ IMPORTANT:** This is the relative path from repository root to your Dockerfile
+**⚠️ IMPORTANT:** This is relative to Build Context, NOT repository root! Since Build Context is `backend/`, use just `Dockerfile` (not `backend/Dockerfile`)
 
 ### **Build Context**
 ```
 backend/
 ```
-**⚠️ IMPORTANT:** This tells Docker where to look for files. Should match the directory containing your Dockerfile.
+**⚠️ IMPORTANT:** This tells Docker where to look for files. Should match the directory containing your Dockerfile. Dockerfile Path is relative to this directory.
 
 ### **Docker Compose File** (if using Docker Compose)
 ```
@@ -222,7 +222,7 @@ unless-stopped
 ## ✅ Step 12: Review and Deploy
 
 1. **Review all settings** - Make sure:
-   - ✅ Dockerfile Path: `backend/Dockerfile`
+   - ✅ Dockerfile Path: `Dockerfile` (relative to Build Context, not repo root!)
    - ✅ Build Context: `backend/`
    - ✅ Port: `8080`
    - ✅ All environment variables are set
@@ -242,7 +242,7 @@ Here's a quick reference of all critical fields:
 Application Name: trae-backend
 Repository: https://github.com/doctororganic/new.git
 Branch: main
-Dockerfile Path: backend/Dockerfile
+Dockerfile Path: Dockerfile          ← Relative to Build Context!
 Build Context: backend/
 Port: 8080
 Health Check: /health
@@ -260,11 +260,14 @@ Environment Variables:
 
 ## 🚨 Common Mistakes to Avoid
 
-1. ❌ **Wrong Dockerfile Path**: Don't use `Dockerfile` if it's in `backend/` folder
-   - ✅ Use: `backend/Dockerfile`
+1. ❌ **Wrong Dockerfile Path**: Don't use `backend/Dockerfile` when Build Context is `backend/`
+   - ✅ Use: `Dockerfile` (relative to Build Context, not repo root!)
 
 2. ❌ **Wrong Build Context**: Don't use `.` when Dockerfile is in subdirectory
    - ✅ Use: `backend/`
+
+3. ❌ **Doubled Path Error**: If you see `backend/backend/Dockerfile` in logs
+   - ✅ Fix: Change Dockerfile Path from `backend/Dockerfile` to `Dockerfile`
 
 3. ❌ **Missing Environment Variables**: Database/Redis URLs are required
    - ✅ Add all required env vars before deploying
