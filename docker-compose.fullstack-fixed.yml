@@ -28,6 +28,8 @@ services:
     container_name: trae-redis
     restart: unless-stopped
     command: redis-server --appendonly yes
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
     volumes:
       - redis_data:/data
     ports:
