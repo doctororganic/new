@@ -30,7 +30,25 @@ func main() {
 	
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
-	e.Use(middleware.CORS())
+	
+	// CORS configuration for frontend integration
+	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins: []string{
+			"http://localhost:3000",
+			"http://localhost:3001",
+			"http://127.0.0.1:3000",
+		},
+		AllowMethods: []string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodDelete, http.MethodOptions},
+		AllowHeaders: []string{
+			echo.HeaderOrigin,
+			echo.HeaderContentType,
+			echo.HeaderAccept,
+			echo.HeaderAuthorization,
+		},
+		AllowCredentials: true,
+		MaxAge:           86400,
+	}))
+	
 	e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(rate.Limit(100))))
 	
 	e.GET("/health", healthCheck)

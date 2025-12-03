@@ -11,6 +11,7 @@ import {
   User,
   LogOut
 } from 'lucide-react';
+import { ApiStatus } from './ApiStatus';
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -55,7 +56,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 })}
               </div>
             </div>
-            <div className="flex items-center">
+            <div className="flex items-center space-x-4">
+              <ApiStatus />
               {user && (
                 <div className="flex items-center space-x-4">
                   <span className="text-sm text-gray-700">{user.name}</span>

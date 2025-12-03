@@ -9,6 +9,7 @@ const apiClient = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+  timeout: 10000, // 10 second timeout
 });
 
 // Add auth token to requests
@@ -22,16 +23,43 @@ apiClient.interceptors.request.use((config) => {
   return config;
 });
 
-// Handle auth errors
+// Handle auth errors and logging
 apiClient.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      if (typeof window !== 'undefined') {
-        localStorage.removeItem('token');
-        window.location.href = '/login';
-      }
+  (response) => {
+    // Log successful API calls in development
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`✅ ${response.config.method?.toUpperCase()} ${response.config.url}`, response.data);
     }
+    return response;
+  },
+  (error) => {
+    // Log errors in development
+    if (process.env.NODE_ENV === 'development') {
+      console.error(
+        `❌ ${error.config?.method?.toUpperCase()} ${error.config?.url}`,
+        error.response?.data || error.message
+      );
+    }
+
+    // Handle different error types
+    if (error.response) {
+      // Server responded with error status
+      if (error.response.status === 401) {
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('token');
+          window.location.href = '/login';
+        }
+      } else if (error.response.status === 500) {
+        console.error('Server error:', error.response.data);
+      }
+    } else if (error.request) {
+      // Request made but no response received
+      console.error('Network error: No response from server. Is the backend running?');
+    } else {
+      // Something else happened
+      console.error('Error:', error.message);
+    }
+
     return Promise.reject(error);
   }
 );
