@@ -8,7 +8,10 @@
 git clone https://github.com/doctororganic/new.git
 cd "Desktop/trae new healthy1"
 
-# Start all services
+# Start all services (local builder)
+export COMPOSE_BAKE=false
+export DOCKER_BUILDKIT=0
+docker-compose build
 docker-compose up -d
 
 # Access the application
@@ -75,14 +78,13 @@ BCRYPT_COST=12
 # Optional: External APIs
 NUTRITIONIX_API_KEY=your_api_key
 SPOONACULAR_API_KEY=your_api_key
-```
-
 ### Frontend Environment Variables
 ```bash
 # API Configuration
 NEXT_PUBLIC_API_URL=http://localhost:8080
 API_URL=http://localhost:8080
-
+# In Docker Compose, set both to http://backend:8080
+```
 # Application Settings
 NEXT_PUBLIC_APP_NAME="Trae Nutrition"
 NEXT_PUBLIC_APP_VERSION=1.0.0

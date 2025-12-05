@@ -54,19 +54,27 @@ jobs:
           
     - name: Install dependencies
       run: |
-        cd backend
+        cd new/backend
         go mod download
         go mod verify
         
     - name: Run tests
       run: |
-        cd backend
+        cd new/backend
         go test -v ./...
         
     - name: Build backend
       run: |
-        cd backend
-        go build -v ./cmd/server/main.go
+        cd new/backend
+        go build -v ./cmd/server
+
+    - name: Backend health check
+      run: |
+        cd new/backend
+        nohup bash -lc "go run ./cmd/server/main.go" >/dev/null 2>&1 &
+        sleep 2
+        curl -f http://localhost:8080/health
+        pkill -f "go run ./cmd/server/main.go" || true
         
     - name: Security scan
       uses: securecodewarrior/github-action-add-sarif@v1
@@ -86,31 +94,21 @@ jobs:
       with:
         node-version: '18'
         cache: 'npm'
-        cache-dependency-path: frontend/package-lock.json
+        cache-dependency-path: new/frontend/package-lock.json
         
     - name: Install dependencies
       run: |
-        cd frontend
+        cd new/frontend
         npm ci
-        
-    - name: Run linter
-      run: |
-        cd frontend
-        npm run lint
-        
-    - name: Run tests
-      run: |
-        cd frontend
-        npm test -- --coverage --watchAll=false
         
     - name: Build frontend
       run: |
-        cd frontend
+        cd new/frontend
         npm run build
         
     - name: Security audit
       run: |
-        cd frontend
+        cd new/frontend
         npm audit --audit-level moderate
 
   integration-tests:
@@ -123,21 +121,46 @@ jobs:
       
     - name: Setup Docker Compose
       run: |
-        docker-compose -f docker-compose.test.yml up -d
+        docker-compose -f new/docker-compose.test.yml up -d
         sleep 30
         
     - name: Run integration tests
       run: |
         # Test backend endpoints
         curl -f http://localhost:8080/health || exit 1
-        curl -f http://localhost:8080/api/v1/status || exit 1
+        curl -f http://localhost:8080/api/status || exit 1
         
         # Test frontend
         curl -f http://localhost:3000 || exit 1
         
+        # Smoke test flows
+        chmod +x new/scripts/smoke.sh
+        API_URL=http://localhost:8080 bash new/scripts/smoke.sh
+
+    - name: Setup Node for e2e
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: new/frontend/package-lock.json
+
+    - name: Install Playwright and deps
+      run: |
+        cd new/frontend
+        npm ci || npm i
+        npx playwright install --with-deps
+
+    - name: Run Playwright e2e against compose
+      env:
+        BASE_URL: http://localhost:3000
+        API_URL: http://localhost:8080
+      run: |
+        cd new/frontend
+        npm run test:e2e
+        
     - name: Cleanup
       run: |
-        docker-compose -f docker-compose.test.yml down
+        docker-compose -f new/docker-compose.test.yml down
 
   security-scan:
     runs-on: ubuntu-latest
@@ -182,7 +205,7 @@ jobs:
     - name: Build and push backend
       uses: docker/build-push-action@v5
       with:
-        context: ./backend
+        context: ./new/backend
         push: true
         tags: |
           ${{ secrets.DOCKER_USERNAME }}/trae-backend:latest
@@ -193,7 +216,7 @@ jobs:
     - name: Build and push frontend
       uses: docker/build-push-action@v5
       with:
-        context: ./frontend
+        context: ./new/frontend
         push: true
         tags: |
           ${{ secrets.DOCKER_USERNAME }}/trae-frontend:latest

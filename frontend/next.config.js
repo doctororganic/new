@@ -1,17 +1,13 @@
 /** @type {import('next').NextConfig} */
+const internalBase = (process.env.INTERNAL_API_URL || 'http://backend:8080/api').replace(/\/api$/, '')
 const nextConfig = {
-  env: {
-    API_URL: process.env.API_URL || 'http://localhost:8080',
-  },
+  env: {},
   images: {
     domains: ['localhost'],
   },
   async rewrites() {
     return [
-      {
-        source: '/api/:path*',
-        destination: `${process.env.API_URL || 'http://localhost:8080'}/:path*`,
-      },
+      { source: '/api/:path*', destination: `${internalBase}/:path*` },
     ];
   },
 }

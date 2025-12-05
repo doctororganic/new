@@ -1,0 +1,70 @@
+import { test, expect } from '@playwright/test'
+
+test('meal create/edit/detail via UI', async ({ page }) => {
+  await page.goto('/meals/new')
+  await page.fill('input[name="name"]', 'PW Meal')
+  await page.fill('input[name="calories"]', '123')
+  await page.fill('input[name="protein"]', '10')
+  await page.fill('input[name="carbs"]', '11')
+  await page.fill('input[name="fat"]', '5')
+  await page.click('button:text("Create")')
+  await expect(page.locator('pre')).toContainText('"status": 201')
+  const jsonText = await page.locator('pre').first().textContent()
+  const match = jsonText?.match(/"id":\s*(\d+)/)
+  const id = match ? match[1] : ''
+  expect(id).not.toEqual('')
+  await page.goto(`/meals/${id}`)
+  await expect(page.locator('pre')).toContainText('"name": "PW Meal"')
+  await page.goto(`/meals/${id}/edit`)
+  await page.fill('input[name="name"]', '')
+  await page.fill('input[name="name"]', 'PW Meal+')
+  await page.click('button:text("Save")')
+  await expect(page.locator('pre')).toContainText('"status": 200')
+  await page.goto(`/meals/${id}`)
+  await expect(page.locator('pre')).toContainText('"name": "PW Meal+"')
+})
+
+test('workout create/edit/detail via UI', async ({ page }) => {
+  await page.goto('/workouts/new')
+  await page.fill('input[name="name"]', 'PW Cardio')
+  await page.fill('input[name="duration"]', '30')
+  await page.fill('input[name="calories_burned"]', '200')
+  await page.fill('input[name="type"]', 'cardio')
+  await page.click('button:text("Create")')
+  await expect(page.locator('pre')).toContainText('"status": 201')
+  const jsonText = await page.locator('pre').first().textContent()
+  const match = jsonText?.match(/"id":\s*(\d+)/)
+  const id = match ? match[1] : ''
+  expect(id).not.toEqual('')
+  await page.goto(`/workouts/${id}`)
+  await expect(page.locator('pre')).toContainText('"name": "PW Cardio"')
+  await page.goto(`/workouts/${id}/edit`)
+  await page.fill('input[name="name"]', '')
+  await page.fill('input[name="name"]', 'PW Cardio+')
+  await page.click('button:text("Save")')
+  await expect(page.locator('pre')).toContainText('"status": 200')
+  await page.goto(`/workouts/${id}`)
+  await expect(page.locator('pre')).toContainText('"name": "PW Cardio+"')
+})
+
+test('conditions edit/detail via UI with cache consistency', async ({ page, request }) => {
+  const res = await request.post(process.env.API_URL || 'http://localhost:8080' + '/api/v1/conditions', {
+    data: { name: 'PWCond', type: 'disease' },
+  })
+  expect(res.ok()).toBeTruthy()
+  const body = await res.json()
+  const id = body.id
+  await page.goto(`/conditions/${id}`)
+  await expect(page.locator('pre')).toContainText('"name": "PWCond"')
+  await page.goto(`/conditions/${id}/edit`)
+  await page.fill('input[name="name"]', '')
+  await page.fill('input[name="name"]', 'PWCond+')
+  await page.click('button:text("Save")')
+  await expect(page.locator('pre')).toContainText('"status": 200')
+  await page.goto(`/conditions/${id}`)
+  await expect(page.locator('pre')).toContainText('"name": "PWCond+"')
+  const list = await request.get((process.env.API_URL || 'http://localhost:8080') + '/api/v1/conditions')
+  const listJson = await list.json()
+  expect(JSON.stringify(listJson)).toContain('PWCond+')
+})
+
